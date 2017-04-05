@@ -51,6 +51,12 @@ class Estoque
 		@livros.size
 	end
 
+	def todos_registros
+		@livros.each do |livro|
+			livro
+		end
+	end
+
 	def mais_baratos_que(valor)
 		@livros.select do |livro|
 			livro.preco <= valor
@@ -102,3 +108,9 @@ end
 	end
 
 	estoque.exporta_csv
+	todos_livros = estoque.todos_registros
+
+	todos_livros.each do |livro|
+		puts livro.titulo
+		puts livro.preco
+	end
