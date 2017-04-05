@@ -1,26 +1,104 @@
 class Livro
 
-	attr_reader :titulo, :preco, :ano_lancamento
+	attr_reader :titulo, :ano_lancamento, :preco
 
-	def initialize(titulo, preco, ano_lancamento)
+	def initialize(titulo, preco,ano_lancamento, possui_reimpressao)
 	    @titulo = titulo
-	    @preco = preco
 	    @ano_lancamento = ano_lancamento
+	    @preco = calcula_preco(preco)
+	    @possui_reimpressao = possui_reimpressao
+  	end
+
+  	def possui_reimpressao?
+  		@possui_reimpressao
+  	end
+
+  	def to_csv
+    	"#{@titulo},#{@ano_lancamento},#{@preco}"
+    end
+
+  	private
+
+  	def calcula_preco(base)
+  		if @ano_lancamento < 2006
+  			if @possui_reimpressao == false
+  				base *= 0.95
+  			else
+  				base *= 0.90
+  			end
+  		elsif @ano_lancamento < 2010
+  			base *= 0.96
+  		end
+  		base
   	end
 
 end
 
-	livro_rails = Livro.new("Agile Web Development with Rails",70,2011)
-	livro_ruby = Livro.new("Programming Ruby 1.9",60,2010)
+class Estoque
+	#attr_writer :livros
 
-	livros = [livro_ruby, livro_rails]
+	def initialize
+    @livros = []
+  	end
 
-	def imprime_nota_fiscal(livros)
-		livros.each do |livro|
-			livro.preco = 1.00
-			puts "Titulo: #{livro.titulo} - #{livro.preco}"
+  	def adiciona(livro)
+  		if livro == livro
+  			@livros << livro
+  		end
+  	end
+
+	def total
+		@livros.size
+	end
+
+	def mais_baratos_que(valor)
+		@livros.select do |livro|
+			livro.preco <= valor
 		end
 	end
 
+	def exporta_csv
+		@livros.each do |livro|
+			puts livro.to_csv
+		end
+	end
+end
 
-	imprime_nota_fiscal(livros)
+
+	def imprime_nota_fiscal(livros)
+		livros.each do |livro|
+			puts "Titulo: #{livro.titulo} - #{livro.preco} - #{livro.possui_reimpressao?}"
+		end
+	end
+
+	def livro_para_newsletter(livro)
+		if livro.ano_lancamento < 1999
+			puts "Newletter/Liquidacao"
+			puts livro.titulo
+			puts livro.preco
+		end
+	end
+
+	livro_rails = Livro.new("Agile Web Development with Rails",70,2011, true)
+	livro_ruby = Livro.new("Programming Ruby 1.9",60,2010, true)	
+	agile = Livro.new("Agile Web Development with Rails",70.00, 2011, true)
+	algoritmos = Livro.new("Algoritmos", 100, 1998, true)
+	arquitetura = Livro.new("Introdução À Arquitetura e Design de Software", 70.00, 2011, true)
+
+	estoque = Estoque.new
+	
+	estoque.adiciona livro_rails
+	estoque.adiciona livro_ruby
+	estoque.adiciona agile
+	estoque.adiciona algoritmos
+	estoque.adiciona arquitetura
+
+	puts estoque.total
+
+	baratos = estoque.mais_baratos_que 80
+	
+	baratos.each do |livro|
+		puts livro.titulo
+	end
+
+	estoque.exporta_csv
