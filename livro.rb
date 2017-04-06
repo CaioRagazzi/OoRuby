@@ -34,17 +34,33 @@ class Livro
 
 end
 
+class Conversor
+	def string_para_alfanumerico(titulo)
+		titulo.gsub /[^\w\s]/,''
+	end
+end
+
+module Contador
+		def << (livro)
+		    push (livro)
+		    if @maximo_necessario.nil? || @maximo_necessario < size
+		      @maximo_necessario = size
+		    end
+		    self
+  		end
+
+  		def maximo_necessario
+  			@maximo_necessario
+  		end
+end
+
 class Estoque
-	#attr_writer :livros
+
+	attr_reader :livros
 
 	def initialize
     @livros = []
-  	end
-
-  	def adiciona(livro)
-  		if livro == livro
-  			@livros << livro
-  		end
+    @livros.extend Contador
   	end
 
 	def total
@@ -68,6 +84,19 @@ class Estoque
 			puts livro.to_csv
 		end
 	end
+
+	def << (livro)
+		@livros << livro if livro
+		self
+	end
+
+	def maximo_necessario
+    @livros.maximo_necessario
+  	end
+
+  	def delete(livro)
+  		@livros.delete livro
+  	end
 end
 
 
@@ -93,11 +122,19 @@ end
 
 	estoque = Estoque.new
 	
-	estoque.adiciona livro_rails
-	estoque.adiciona livro_ruby
-	estoque.adiciona agile
-	estoque.adiciona algoritmos
-	estoque.adiciona arquitetura
+	estoque << livro_rails
+	puts estoque.maximo_necessario
+	estoque << livro_ruby
+	puts estoque.maximo_necessario
+	estoque << agile
+	puts estoque.maximo_necessario
+	estoque << algoritmos
+	puts estoque.maximo_necessario
+	estoque << arquitetura
+	puts estoque.maximo_necessario
+
+	estoque.delete arquitetura
+	puts estoque.maximo_necessario
 
 	puts estoque.total
 
@@ -113,4 +150,4 @@ end
 	todos_livros.each do |livro|
 		puts livro.titulo
 		puts livro.preco
-	end
+	end	
